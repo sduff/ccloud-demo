@@ -27,5 +27,5 @@ provider "confluent" {
 
 # Create a new environment
 resource "confluent_environment" "env" {
-  display_name = "sduff-new-env"
+  display_name = "sduff-env"
 }
