@@ -34,3 +34,8 @@ resource "confluent_environment" "env" {
 resource "confluent_environment" "env2" {
   display_name = "sduff1"
 }
+
+# Create a new environment
+resource "confluent_environment" "env3" {
+  display_name = "sduff3"
+}
