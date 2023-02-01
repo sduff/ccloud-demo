@@ -188,5 +188,5 @@ resource "confluent_schema" "purchase" {
 }
 
 resource "confluent_environment" "test-env" {
-  display_name = "sduff00"
+  display_name = "sduff9876543210"
 }
