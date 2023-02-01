@@ -166,7 +166,7 @@ resource "confluent_api_key" "env-manager-schema-registry-api-key" {
 
 resource "null_resource" "purchase-schema" {
   triggers = {
-    schema_sha1 = "${sha1(file("./purchase.asvc"))}"
+    schema_sha1 = "${sha1(file("./purchase.avsc"))}"
   }
 }
 
