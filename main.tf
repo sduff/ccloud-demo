@@ -164,6 +164,12 @@ resource "confluent_api_key" "env-manager-schema-registry-api-key" {
   ]
 }
 
+resource "null_resource" "purchase-schema" {
+  triggers = {
+    schema_sha1 = "${sha1(file("./purchase.asvc"))}"
+  }
+}
+
 resource "confluent_schema" "purchase" {
   schema_registry_cluster {
     id = confluent_schema_registry_cluster.essentials.id
@@ -176,9 +182,9 @@ resource "confluent_schema" "purchase" {
     key    = confluent_api_key.env-manager-schema-registry-api-key.id
     secret = confluent_api_key.env-manager-schema-registry-api-key.secret
   }
-  triggers = {
-    policy_sha1 = "${sha1(file("./purchase.avsc"))}"
-  }
+  depends_on = [
+    null_resource.purchase-schema
+  ]
 }
 
 
