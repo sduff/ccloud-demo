@@ -16,7 +16,7 @@
       "type": "string"
     },
     {
-      "name": "customer_dob",
+      "name": "customer_date_of_birth",
       "type": "string"
     }
 
