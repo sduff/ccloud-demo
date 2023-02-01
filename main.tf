@@ -26,8 +26,8 @@ provider "confluent" {
 }
 
 # Create a new environment
-resource "confluent_environment" "env" {
-  display_name = "sduff0123456789"
-
-  lifecycle { prevent_destroy = true }
-}
+#resource "confluent_environment" "env" {
+#  display_name = "sduff0123456789"
+#
+#  lifecycle { prevent_destroy = true }
+#}
