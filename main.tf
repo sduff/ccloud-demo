@@ -186,7 +186,3 @@ resource "confluent_schema" "purchase" {
     null_resource.purchase-schema
   ]
 }
-
-resource "confluent_environment" "test-env" {
-  display_name = "sduff9876543210"
-}
