@@ -69,7 +69,7 @@ resource "confluent_kafka_cluster" "basic" {
 // 'app-manager' service account is required in this configuration to create 'purchase' topic and grant ACLs
 // to 'app-producer' and 'app-consumer' service accounts.
 resource "confluent_service_account" "app-manager" {
-  display_name = "app-manager"
+  display_name = "sduff-app-manager"
   description  = "Service account to manage 'inventory' Kafka cluster"
 }
 
@@ -175,6 +175,9 @@ resource "confluent_schema" "purchase" {
   credentials {
     key    = confluent_api_key.env-manager-schema-registry-api-key.id
     secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+  }
+  triggers = {
+    policy_sha1 = "${sha1(file("./purchase.avsc"))}"
   }
 }
 
