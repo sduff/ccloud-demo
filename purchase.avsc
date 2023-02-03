@@ -10,10 +10,6 @@
     {
       "name": "amount",
       "type": "double"
-    },
-    {
-      "name": "debt",
-      "type": "double"
     }
   ]
 }
