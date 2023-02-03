@@ -10,15 +10,6 @@
     {
       "name": "amount",
       "type": "double"
-    },
-    {
-      "name": "customer_id",
-      "type": "string"
-    },
-    {
-      "name": "customer_date_of_birth",
-      "type": "string"
     }
-
   ]
 }
