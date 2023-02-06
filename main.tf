@@ -193,7 +193,7 @@ resource "confluent_schema" "purchase_new_schema" {
     id = confluent_schema_registry_cluster.essentials.id
   }
   rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
-  subject_name = "purchase_old-value"
+  subject_name = "purchase_new-value"
   format = "AVRO"
   schema = file("./purchase.avsc")
   credentials {
