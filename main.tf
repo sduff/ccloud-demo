@@ -113,7 +113,7 @@ resource "confluent_kafka_topic" "purchase" {
   kafka_cluster {
     id = confluent_kafka_cluster.basic.id
   }
-  topic_name    = "purchase"
+  topic_name    = "purchase2"
   rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
   credentials {
     key    = confluent_api_key.app-manager-kafka-api-key.id
