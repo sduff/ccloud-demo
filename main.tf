@@ -121,35 +121,11 @@ resource "confluent_kafka_topic" "purchase" {
   }
 }
 
-resource "confluent_kafka_topic" "purchase2" {
+resource "confluent_kafka_topic" "purchase_new" {
   kafka_cluster {
     id = confluent_kafka_cluster.basic.id
   }
-  topic_name    = "purchase2"
-  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
-  credentials {
-    key    = confluent_api_key.app-manager-kafka-api-key.id
-    secret = confluent_api_key.app-manager-kafka-api-key.secret
-  }
-}
-
-resource "confluent_kafka_topic" "purchase3" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
-  }
-  topic_name    = "purchase3"
-  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
-  credentials {
-    key    = confluent_api_key.app-manager-kafka-api-key.id
-    secret = confluent_api_key.app-manager-kafka-api-key.secret
-  }
-}
-
-resource "confluent_kafka_topic" "purchase4" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
-  }
-  topic_name    = "purchase4"
+  topic_name    = "purchase_new"
   rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
   credentials {
     key    = confluent_api_key.app-manager-kafka-api-key.id
@@ -204,6 +180,20 @@ resource "confluent_schema" "purchase" {
   }
   rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
   subject_name = "purchase-value"
+  format = "AVRO"
+  schema = file("./purchase.avsc")
+  credentials {
+    key    = confluent_api_key.env-manager-schema-registry-api-key.id
+    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+  }
+}
+
+resource "confluent_schema" "purchase_new_schema" {
+  schema_registry_cluster {
+    id = confluent_schema_registry_cluster.essentials.id
+  }
+  rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
+  subject_name = "purchase_new-value"
   format = "AVRO"
   schema = file("./purchase.avsc")
   credentials {
