@@ -133,6 +133,18 @@ resource "confluent_kafka_topic" "purchase2" {
   }
 }
 
+resource "confluent_kafka_topic" "purchase3" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name    = "purchase3"
+  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-api-key.secret
+  }
+}
+
 resource "confluent_service_account" "env-manager" {
   display_name = "env-manager"
   description  = "Service account to manage 'Terraform-Environment' environment"
