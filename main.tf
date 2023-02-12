@@ -4,6 +4,13 @@ terraform {
       source  = "confluentinc/confluent"
       version = "1.28.0"
     }
+
+    required_providers {
+      azurerm = {
+        source = "hashicorp/azurerm"
+        version = "~> 3.0.2"
+      }
+    }
   }
 }
 
@@ -222,4 +229,12 @@ resource "confluent_schema" "purchase_new_schema" {
 # Create a KeyVault
 # Store API Key in KeyVault
 
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "apac-ps-ccloud-rg" {
+  name ="apac-ps-ccloud-rg"
+  location = "australiasoutheast"
+}
 
