@@ -234,5 +234,8 @@ provider "azurerm" {
 resource "azurerm_resource_group" "apac-ps-ccloud-rg" {
   name ="apac-ps-ccloud-rg"
   location = "australiasoutheast"
+  tags = {
+    owner_email = "sduff@confluent.io"
+  }
 }
 
