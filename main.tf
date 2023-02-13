@@ -275,5 +275,12 @@ resource "azurerm_key_vault" "keyvault" {
   tags = {
     owner_email = "sduff@confluent.io"
   }
+}
 
+# Create a new secret and store in the keyvault
+resource "azurerm_key_vault_secret" "app_mgr_secret" {
+  name         = confluent_service_account.app-manager.display_name
+  value        = "${confluent_api_key.app-manager-kafka-api-key.id}:${confluent_api_key.app-manager-kafka-api-key.secret}"
+  key_vault_id = azurerm_key_vault.keyvault.id
+  depends_on   = [azurerm_key_vault.keyvault]
 }
