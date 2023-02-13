@@ -232,8 +232,8 @@ provider "azurerm" {
 }
 
 # Create a resource Group
-resource "azurerm_resource_group" "apac_ps_ccloud_rg" {
-  name ="apac-ps-ccloud-rg"
+resource "azurerm_resource_group" "rg" {
+  name ="apac-ps-confluent-cloud-rg"
   location = "australiasoutheast"
   tags = {
     owner_email = "sduff@confluent.io"
@@ -244,10 +244,10 @@ resource "azurerm_resource_group" "apac_ps_ccloud_rg" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "keyvault" {
-  depends_on                  = [azurerm_resource_group.apac_ps_ccloud_rg]
-  name                        = "keyvault-apac-ps-ccloud"
-  location                    = azurerm_resource_group.apac_ps_ccloud_rg.location
-  resource_group_name         = azurerm_resource_group.apac_ps_ccloud_rg.name
+  depends_on                  = [azurerm_resource_group.rg]
+  name                        = "kv-apac-ps"
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days  = 7
