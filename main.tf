@@ -149,75 +149,76 @@ resource "confluent_kafka_topic" "purchase_alt" {
   }
 }
 
-resource "confluent_service_account" "env-manager" {
-  display_name = "env-manager"
-  description  = "Service account to manage 'Terraform-Environment' environment"
-}
-
-resource "confluent_role_binding" "env-manager-environment-admin" {
-  principal   = "User:${confluent_service_account.env-manager.id}"
-  role_name   = "EnvironmentAdmin"
-  crn_pattern = confluent_environment.staging.resource_name
-}
-
-resource "confluent_api_key" "env-manager-schema-registry-api-key" {
-  display_name = "env-manager-schema-registry-api-key"
-  description  = "Schema Registry API Key that is owned by 'Terraform-Environment' service account"
-  owner {
-    id          = confluent_service_account.env-manager.id
-    api_version = confluent_service_account.env-manager.api_version
-    kind        = confluent_service_account.env-manager.kind
-  }
-
-  managed_resource {
-    id          = confluent_schema_registry_cluster.essentials.id
-    api_version = confluent_schema_registry_cluster.essentials.api_version
-    kind        = confluent_schema_registry_cluster.essentials.kind
-
-    environment {
-      id = confluent_environment.staging.id
-    }
-  }
-
-  # The goal is to ensure that confluent_role_binding.env-manager-environment-admin is created before
-  # confluent_api_key.env-manager-schema-registry-api-key is used to create instances of
-  # confluent_schema resources.
-
-  # 'depends_on' meta-argument is specified in confluent_api_key.env-manager-schema-registry-api-key to avoid having
-  # multiple copies of this definition in the configuration which would happen if we specify it in
-  # confluent_schema resources instead.
-  depends_on = [
-    confluent_role_binding.env-manager-environment-admin
-  ]
-}
-
-resource "confluent_schema" "purchase" {
-  schema_registry_cluster {
-    id = confluent_schema_registry_cluster.essentials.id
-  }
-  rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
-  subject_name = "purchase-value"
-  format = "AVRO"
-  schema = file("./purchase.avsc")
-  credentials {
-    key    = confluent_api_key.env-manager-schema-registry-api-key.id
-    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
-  }
-}
-
-resource "confluent_schema" "purchase_new_schema" {
-  schema_registry_cluster {
-    id = confluent_schema_registry_cluster.essentials.id
-  }
-  rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
-  subject_name = "purchase_new-value"
-  format = "AVRO"
-  schema = file("./purchase.avsc")
-  credentials {
-    key    = confluent_api_key.env-manager-schema-registry-api-key.id
-    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
-  }
-}
+#resource "confluent_service_account" "env-manager" {
+#  display_name = "env-manager"
+#  description  = "Service account to manage 'Terraform-Environment' environment"
+#}
+#
+#resource "confluent_role_binding" "env-manager-environment-admin" {
+#  principal   = "User:${confluent_service_account.env-manager.id}"
+#  role_name   = "EnvironmentAdmin"
+#  crn_pattern = confluent_environment.staging.resource_name
+#}
+#
+#resource "confluent_api_key" "env-manager-schema-registry-api-key" {
+#  display_name = "env-manager-schema-registry-api-key"
+#  description  = "Schema Registry API Key that is owned by 'Terraform-Environment' service account"
+#  owner {
+#    id          = confluent_service_account.env-manager.id
+#    api_version = confluent_service_account.env-manager.api_version
+#    kind        = confluent_service_account.env-manager.kind
+#  }
+#
+#  managed_resource {
+#    id          = confluent_schema_registry_cluster.essentials.id
+#    api_version = confluent_schema_registry_cluster.essentials.api_version
+#    kind        = confluent_schema_registry_cluster.essentials.kind
+#
+#    environment {
+#      id = confluent_environment.staging.id
+#    }
+#  }
+#
+#  # The goal is to ensure that confluent_role_binding.env-manager-environment-admin is created before
+#  # confluent_api_key.env-manager-schema-registry-api-key is used to create instances of
+#  # confluent_schema resources.
+#
+#  # 'depends_on' meta-argument is specified in confluent_api_key.env-manager-schema-registry-api-key to avoid having
+#  # multiple copies of this definition in the configuration which would happen if we specify it in
+#  # confluent_schema resources instead.
+#  depends_on = [
+#    confluent_role_binding.env-manager-environment-admin
+#  ]
+#}
+#
+#resource "confluent_schema" "purchase" {
+#  schema_registry_cluster {
+#    id = confluent_schema_registry_cluster.essentials.id
+#  }
+#  rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
+#  subject_name = "purchase-value"
+#  format = "AVRO"
+#  schema = file("./purchase.avsc")
+#  credentials {
+#    key    = confluent_api_key.env-manager-schema-registry-api-key.id
+#    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+#  }
+#}
+#
+#resource "confluent_schema" "purchase_new_schema" {
+#  schema_registry_cluster {
+#    id = confluent_schema_registry_cluster.essentials.id
+#  }
+#  rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
+#  subject_name = "purchase_new-value"
+#  format = "AVRO"
+#  schema = file("./purchase.avsc")
+#  credentials {
+#    key    = confluent_api_key.env-manager-schema-registry-api-key.id
+#    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
+#  }
+#}
+#
 
 ###
 
