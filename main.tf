@@ -31,9 +31,9 @@ provider "confluent" {
 }
 
 
-resource "confluent_environment" "staging" {
-  display_name = "Terraform-Environment"
-}
+#resource "confluent_environment" "staging" {
+#  display_name = "Terraform-Environment"
+#}
 
 ## Stream Governance and Kafka clusters can be in different regions as well as different cloud providers,
 ## but you should to place both in the same cloud and region to restrict the fault isolation boundary.
