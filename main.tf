@@ -45,7 +45,7 @@ resource "confluent_kafka_cluster" "dedicated" {
   }
 
   environment {
-    id = confluent_environment.development.id
+    id = data.confluent_environment.development.id
   }
 
   lifecycle {
@@ -62,7 +62,7 @@ resource "confluent_kafka_cluster" "basic" {
   basic {}
 
   environment {
-    id = confluent_environment.development.id
+    id = data.confluent_environment.development.id
   }
 
   lifecycle {
