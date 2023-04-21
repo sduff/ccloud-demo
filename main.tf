@@ -30,7 +30,42 @@ provider "confluent" {
   cloud_api_secret = var.confluent_cloud_api_secret
 }
 
-provider "azurerm" {
-  features {}
+data "confluent_environment" "development" {
+  display_name = "Terraform-Environment"
 }
 
+# dedicated
+resource "confluent_kafka_cluster" "dedicated" {
+  display_name = "dedicated_kafka_cluster"
+  availability = "MULTI_ZONE"
+  cloud        = "AWS"
+  region       = "us-east-2"
+  dedicated {
+    cku = 2
+  }
+
+  environment {
+    id = confluent_environment.development.id
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# basic
+resource "confluent_kafka_cluster" "basic" {
+  display_name = "basic_kafka_cluster"
+  availability = "SINGLE_ZONE"
+  cloud        = "AWS"
+  region       = "us-east-2"
+  basic {}
+
+  environment {
+    id = confluent_environment.development.id
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
