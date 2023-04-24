@@ -36,7 +36,7 @@ data "confluent_environment" "development" {
 
 # dedicated
 resource "confluent_kafka_cluster" "dedicated" {
-  display_name = "dedicated_kafka_cluster_2"
+  display_name = "dedicated_kafka_cluster_3"
   availability = "MULTI_ZONE"
   cloud        = "AWS"
   region       = "us-east-2"
