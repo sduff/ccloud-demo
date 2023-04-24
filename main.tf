@@ -192,10 +192,10 @@ resource "confluent_kafka_topic" "topic02" {
 
 resource "confluent_connector" "snowflake-sink" {
   environment {
-    id = confluent_environment.staging.id
+    id = data.confluent_environment.development.id
   }
   kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
+    id = confluent_kafka_cluster.dedicated.id
   }
 
   config_sensitive = {
