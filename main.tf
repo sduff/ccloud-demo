@@ -137,7 +137,7 @@ resource "confluent_service_account" "bad-sa" {
 resource "confluent_role_binding" "rb" {
   principal   = "User:${data.confluent_user.user-account.id}"
   role_name   = "OrganizationalAdmin"
-  crn_pattern = confluent_environment.dedicated.resource_name
+  crn_pattern = data.confluent_environment.dedicated.resource_name
 }
 
 # Create Topic 1
