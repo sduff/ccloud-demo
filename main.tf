@@ -188,6 +188,35 @@ resource "confluent_kafka_topic" "topic02" {
   }
 }
 
+# Create a Connector
+
+resource "confluent_connector" "snowflake-sink" {
+  environment {
+    id = confluent_environment.staging.id
+  }
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+
+  config_sensitive = {
+    "snowflake.private.key" = "***REDACTED***"
+  }
+
+  config_nonsensitive = {
+    "topics"                   = confluent_kafka_topic.topic01.topic_name
+    "input.data.format"        = "JSON"
+    "connector.class"          = "SnowflakeSink"
+    "name"                     = "SnowflakeSinkConnector_0"
+    "kafka.auth.mode"          = "SERVICE_ACCOUNT"
+    "kafka.service.account.id" = confluent_service_account.bad-sa.id
+    "snowflake.url.name"       = "https://myorg-account123.us-east-2.aws.snowflakecomputing.com"
+    "snowflake.user.name"      = "confluent"
+    "snowflake.database.name"  = "orders"
+    "snowflake.schema.name"    = "core"
+    "tasks.max"                = "1"
+  }
+}
+
 # Attempt to create a non-approved resource
 
 resource "confluent_invitation" "bad-invite" {
