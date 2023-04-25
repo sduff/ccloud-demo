@@ -1,8 +1,19 @@
+#  _______       __ __            _______       _______          __
+# |   _   .-----|  |__.----.--.--|   _   .-----|   _   .-----.--|  .-----.
+# |.  1   |  _  |  |  |  __|  |  |.  1   |__ --|.  1___|  _  |  _  |  -__|
+# |.  ____|_____|__|__|____|___  |.  _   |_____|.  |___|_____|_____|_____|
+# |:  |                    |_____|:  |   |     |:  1   |
+# |::.|                          |::.|:. |     |::.. . |
+# `---'---               __  ____'--- ---'     `-------'     ___                       ______ __
+# |_     _|.-----.-----.|  ||_     _|.-----.----.----.---.-.'  _|.-----.----.--------.|   __ \  |.---.-.-----.
+#   |   |  |  -__|__ --||   _||   |  |  -__|   _|   _|  _  |   _||  _  |   _|        ||    __/  ||  _  |     |
+#   |___|  |_____|_____||____||___|  |_____|__| |__| |___._|__|  |_____|__| |__|__|__||___|  |__||___._|__|__|
+
 terraform {
   required_providers {
     confluent = {
       source  = "confluentinc/confluent"
-      version = "1.28.0"
+      version = "1.39.0"
     }
 
     azurerm = {
@@ -30,258 +41,213 @@ provider "confluent" {
   cloud_api_secret = var.confluent_cloud_api_secret
 }
 
-
-#resource "confluent_environment" "staging" {
-#  display_name = "Terraform-Environment"
-#}
-
-## Stream Governance and Kafka clusters can be in different regions as well as different cloud providers,
-## but you should to place both in the same cloud and region to restrict the fault isolation boundary.
-#data "confluent_schema_registry_region" "essentials" {
-#  cloud   = "AWS"
-#  region  = "us-east-2"
-#  package = "ESSENTIALS"
-#}
-#
-#resource "confluent_schema_registry_cluster" "essentials" {
-#  package = data.confluent_schema_registry_region.essentials.package
-#
-#  environment {
-#    id = confluent_environment.staging.id
-#  }
-#
-#  region {
-#    # See https://docs.confluent.io/cloud/current/stream-governance/packages.html#stream-governance-regions
-#    id = data.confluent_schema_registry_region.essentials.id
-#  }
-#}
-#
-## Update the config to use a cloud provider and region of your choice.
-## https://registry.terraform.io/providers/confluentinc/confluent/latest/docs/resources/confluent_kafka_cluster
-#resource "confluent_kafka_cluster" "basic" {
-#  display_name = "schema-test"
-#  availability = "SINGLE_ZONE"
-#  cloud        = "AWS"
-#  region       = "us-east-2"
-#  basic {}
-#  environment {
-#    id = confluent_environment.staging.id
-#  }
-#}
-#
-#// 'app-manager' service account is required in this configuration to create 'purchase' topic and grant ACLs
-#// to 'app-producer' and 'app-consumer' service accounts.
-#resource "confluent_service_account" "app-manager" {
-#  display_name = "sduff-app-manager"
-#  description  = "Service account to manage 'schema-test' Kafka cluster"
-#}
-#
-#resource "confluent_role_binding" "app-manager-kafka-cluster-admin" {
-#  principal   = "User:${confluent_service_account.app-manager.id}"
-#  role_name   = "CloudClusterAdmin"
-#  crn_pattern = confluent_kafka_cluster.basic.rbac_crn
-#}
-#
-#resource "confluent_api_key" "app-manager-kafka-api-key" {
-#  display_name = "app-manager-kafka-api-key"
-#  description  = "Kafka API Key that is owned by 'sduff-app-manager' service account"
-#  owner {
-#    id          = confluent_service_account.app-manager.id
-#    api_version = confluent_service_account.app-manager.api_version
-#    kind        = confluent_service_account.app-manager.kind
-#  }
-#
-#  managed_resource {
-#    id          = confluent_kafka_cluster.basic.id
-#    api_version = confluent_kafka_cluster.basic.api_version
-#    kind        = confluent_kafka_cluster.basic.kind
-#
-#    environment {
-#      id = confluent_environment.staging.id
-#    }
-#  }
-#
-#  # The goal is to ensure that confluent_role_binding.app-manager-kafka-cluster-admin is created before
-#  # confluent_api_key.app-manager-kafka-api-key is used to create instances of
-#  # confluent_kafka_topic, confluent_kafka_acl resources.
-#
-#  # 'depends_on' meta-argument is specified in confluent_api_key.app-manager-kafka-api-key to avoid having
-#  # multiple copies of this definition in the configuration which would happen if we specify it in
-#  # confluent_kafka_topic, confluent_kafka_acl resources instead.
-#  depends_on = [
-#    confluent_role_binding.app-manager-kafka-cluster-admin
-#  ]
-#}
-#
-#resource "confluent_kafka_topic" "purchase" {
-#  kafka_cluster {
-#    id = confluent_kafka_cluster.basic.id
-#  }
-#  topic_name    = "purchase"
-#  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
-#  credentials {
-#    key    = confluent_api_key.app-manager-kafka-api-key.id
-#    secret = confluent_api_key.app-manager-kafka-api-key.secret
-#  }
-#}
-#
-#resource "confluent_kafka_topic" "purchase_new" {
-#  kafka_cluster {
-#    id = confluent_kafka_cluster.basic.id
-#  }
-#  topic_name    = "purchase_new"
-#  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
-#  credentials {
-#    key    = confluent_api_key.app-manager-kafka-api-key.id
-#    secret = confluent_api_key.app-manager-kafka-api-key.secret
-#  }
-#}
-#
-#resource "confluent_kafka_topic" "purchase_alt" {
-#  kafka_cluster {
-#    id = confluent_kafka_cluster.basic.id
-#  }
-#  topic_name    = "purchase_alt"
-#  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
-#  credentials {
-#    key    = confluent_api_key.app-manager-kafka-api-key.id
-#    secret = confluent_api_key.app-manager-kafka-api-key.secret
-#  }
-#}
-
-#resource "confluent_service_account" "env-manager" {
-#  display_name = "env-manager"
-#  description  = "Service account to manage 'Terraform-Environment' environment"
-#}
-
-#resource "confluent_role_binding" "env-manager-environment-admin" {
-#  principal   = "User:${confluent_service_account.env-manager.id}"
-#  role_name   = "EnvironmentAdmin"
-#  crn_pattern = confluent_environment.staging.resource_name
-#}
-#
-#resource "confluent_api_key" "env-manager-schema-registry-api-key" {
-#  display_name = "env-manager-schema-registry-api-key"
-#  description  = "Schema Registry API Key that is owned by 'Terraform-Environment' service account"
-#  owner {
-#    id          = confluent_service_account.env-manager.id
-#    api_version = confluent_service_account.env-manager.api_version
-#    kind        = confluent_service_account.env-manager.kind
-#  }
-#
-#  managed_resource {
-#    id          = confluent_schema_registry_cluster.essentials.id
-#    api_version = confluent_schema_registry_cluster.essentials.api_version
-#    kind        = confluent_schema_registry_cluster.essentials.kind
-#
-#    environment {
-#      id = confluent_environment.staging.id
-#    }
-#  }
-#
-#  # The goal is to ensure that confluent_role_binding.env-manager-environment-admin is created before
-#  # confluent_api_key.env-manager-schema-registry-api-key is used to create instances of
-#  # confluent_schema resources.
-#
-#  # 'depends_on' meta-argument is specified in confluent_api_key.env-manager-schema-registry-api-key to avoid having
-#  # multiple copies of this definition in the configuration which would happen if we specify it in
-#  # confluent_schema resources instead.
-#  depends_on = [
-#    confluent_role_binding.env-manager-environment-admin
-#  ]
-#}
-#
-#resource "confluent_schema" "purchase" {
-#  schema_registry_cluster {
-#    id = confluent_schema_registry_cluster.essentials.id
-#  }
-#  rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
-#  subject_name = "purchase-value"
-#  format = "AVRO"
-#  schema = file("./purchase.avsc")
-#  credentials {
-#    key    = confluent_api_key.env-manager-schema-registry-api-key.id
-#    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
-#  }
-#}
-#
-#resource "confluent_schema" "purchase_new_schema" {
-#  schema_registry_cluster {
-#    id = confluent_schema_registry_cluster.essentials.id
-#  }
-#  rest_endpoint = confluent_schema_registry_cluster.essentials.rest_endpoint
-#  subject_name = "purchase_new-value"
-#  format = "AVRO"
-#  schema = file("./purchase.avsc")
-#  credentials {
-#    key    = confluent_api_key.env-manager-schema-registry-api-key.id
-#    secret = confluent_api_key.env-manager-schema-registry-api-key.secret
-#  }
-#}
-#
-
-###
-
-# Create a service account
-# Create an API key
-
-# Create a KeyVault
-# Store API Key in KeyVault
-
-provider "azurerm" {
-  features {}
+data "confluent_environment" "development" {
+  display_name = "Terraform-Environment"
 }
+
+data "confluent_user" "user-account" {
+  id = "u-ymkz66"
+}
+
 #
-## Create a resource Group
-#resource "azurerm_resource_group" "rg" {
-#  name ="apac-ps-confluent-cloud-rg"
-#  location = "australiasoutheast"
-#  tags = {
-#    owner_email = "sduff@confluent.io"
-#  }
-#}
+# ----------------------------------------#
+# Terraform plan for as many bad policies #
+# ----------------------------------------#
 #
-## Create a KeyVault
-#data "azurerm_client_config" "current" {}
-#
-#resource "azurerm_key_vault" "keyvault" {
-#  depends_on                  = [azurerm_resource_group.rg]
-#  name                        = "kv-apac-ps"
-#  location                    = azurerm_resource_group.rg.location
-#  resource_group_name         = azurerm_resource_group.rg.name
-#  enabled_for_disk_encryption = true
-#  tenant_id                   = data.azurerm_client_config.current.tenant_id
-#  soft_delete_retention_days  = 7
-#  purge_protection_enabled    = false
-#
-#  sku_name = "standard"
-#
-#  access_policy {
-#    tenant_id = data.azurerm_client_config.current.tenant_id
-#    object_id = data.azurerm_client_config.current.object_id
-#
-#    key_permissions = [
-#      "Get",
-#    ]
-#
-#    secret_permissions = [
-#      "Get", "Backup", "Delete", "List", "Purge", "Recover", "Restore", "Set",
-#    ]
-#
-#    storage_permissions = [
-#      "Get",
-#    ]
-#  }
-#
-#  tags = {
-#    owner_email = "sduff@confluent.io"
-#  }
-#}
-#
-## Create a new secret and store in the keyvault
-#resource "azurerm_key_vault_secret" "app_mgr_secret" {
-#  name         = confluent_service_account.app-manager.display_name
-#  value        = "${confluent_api_key.app-manager-kafka-api-key.id}:${confluent_api_key.app-manager-kafka-api-key.secret}"
-#  key_vault_id = azurerm_key_vault.keyvault.id
-#  depends_on   = [azurerm_key_vault.keyvault]
-#}
+
+# Cluster
+# - non approved cloud
+# - non approved region
+# - dedicated
+
+resource "confluent_kafka_cluster" "dedicated" {
+  display_name = "bad_dedicated_kafka_cluster"
+  availability = "MULTI_ZONE"
+  cloud        = "GCP"
+  region       = "europe-central2-a"
+  dedicated {
+    cku = 2
+  }
+
+  environment {
+    id = data.confluent_environment.development.id
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# API Key
+# - has invalid name
+# - owner is a user, not a service account
+
+resource "confluent_api_key" "user-api-key" {
+  display_name = "bad-policy-user-api-key"
+  description  = "Bad Policy User API Key"
+  owner {
+    id          = data.confluent_user.user-account.id
+    api_version = data.confluent_user.user-account.api_version
+    kind        = data.confluent_user.user-account.kind
+  }
+
+  managed_resource {
+    id          = confluent_kafka_cluster.dedicated.id
+    api_version = confluent_kafka_cluster.dedicated.api_version
+    kind        = confluent_kafka_cluster.dedicated.kind
+
+    environment {
+      id = data.confluent_environment.development.id
+    }
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# Cluster Config
+# - enable auto.create.topics.enable
+
+resource "confluent_kafka_cluster_config" "config" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.dedicated.id
+  }
+  rest_endpoint = confluent_kafka_cluster.dedicated.rest_endpoint
+  config = {
+    "auto.create.topics.enable" = "true"
+  }
+  credentials {
+    key    = confluent_api_key.user-api-key.id
+    secret = confluent_api_key.user-api-key.secret
+  }
+}
+
+# Create a Service Account
+# - invalid name
+
+resource "confluent_service_account" "bad-sa" {
+  display_name = "bad-policy-service-account"
+  description  = "Bad Policy Service Account"
+}
+
+# Create RBAC
+# - invalid role
+
+resource "confluent_role_binding" "rb" {
+  principal   = "User:${data.confluent_user.user-account.id}"
+  role_name   = "OrganizationalAdmin"
+  crn_pattern = data.confluent_environment.development.resource_name
+}
+
+# Create Topic 1
+# - invalid topic name
+# - lower partition count
+# - config retention.ms
+
+resource "confluent_kafka_topic" "topic01" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.dedicated.id
+  }
+  topic_name         = "topic01"
+  partitions_count   = 1
+  rest_endpoint      = confluent_kafka_cluster.dedicated.rest_endpoint
+  credentials {
+    key    = confluent_api_key.user-api-key.id
+    secret = confluent_api_key.user-api-key.secret
+  }
+  config = {
+    "retention.ms"                        = "999999999"
+  }
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# Create Topic 2
+# - invalid topic name
+# - high partition count
+# - config retention.bytes
+
+resource "confluent_kafka_topic" "topic02" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.dedicated.id
+  }
+  topic_name         = "topic02"
+  partitions_count   = 25
+  rest_endpoint      = confluent_kafka_cluster.dedicated.rest_endpoint
+  credentials {
+    key    = confluent_api_key.user-api-key.id
+    secret = confluent_api_key.user-api-key.secret
+  }
+  config = {
+    "retention.bytes"                     = "1073741824"
+  }
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# Create a Connector
+
+resource "confluent_connector" "snowflake-sink" {
+  environment {
+    id = data.confluent_environment.development.id
+  }
+  kafka_cluster {
+    id = confluent_kafka_cluster.dedicated.id
+  }
+
+  config_sensitive = {
+    "snowflake.private.key" = "***REDACTED***"
+  }
+
+  config_nonsensitive = {
+    "topics"                   = confluent_kafka_topic.topic01.topic_name
+    "input.data.format"        = "JSON"
+    "connector.class"          = "SnowflakeSink"
+    "name"                     = "SnowflakeSinkConnector_0"
+    "kafka.auth.mode"          = "SERVICE_ACCOUNT"
+    "kafka.service.account.id" = confluent_service_account.bad-sa.id
+    "snowflake.url.name"       = "https://myorg-account123.us-east-2.aws.snowflakecomputing.com"
+    "snowflake.user.name"      = "confluent"
+    "snowflake.database.name"  = "orders"
+    "snowflake.schema.name"    = "core"
+    "tasks.max"                = "1"
+  }
+}
+
+resource "confluent_connector" "datagen-source" {
+  environment {
+    id = data.confluent_environment.development.id
+  }
+  kafka_cluster {
+    id = confluent_kafka_cluster.dedicated.id
+  }
+
+  config_sensitive = {}
+
+  config_nonsensitive = {
+    "connector.class"          = "DatagenSource"
+    "name"                     = "DatagenSourceConnector_0"
+    "kafka.auth.mode"          = "SERVICE_ACCOUNT"
+    "kafka.service.account.id" = confluent_service_account.bad-sa.id
+    "kafka.topic"              = confluent_kafka_topic.topic01.topic_name
+    "output.data.format"       = "JSON"
+    "quickstart"               = "ORDERS"
+    "tasks.max"                = "1"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# Attempt to create a non-approved resource
+
+resource "confluent_invitation" "bad-invite" {
+      email = "hacker@example.com"
+}
+
+# :(
+# No resource for testing "preventing the deletion of topics"
