@@ -217,6 +217,32 @@ resource "confluent_connector" "snowflake-sink" {
   }
 }
 
+resource "confluent_connector" "datagen-source" {
+  environment {
+    id = confluent_environment.staging.id
+  }
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+
+  config_sensitive = {}
+
+  config_nonsensitive = {
+    "connector.class"          = "DatagenSource"
+    "name"                     = "DatagenSourceConnector_0"
+    "kafka.auth.mode"          = "SERVICE_ACCOUNT"
+    "kafka.service.account.id" = confluent_service_account.bad-sa.id
+    "kafka.topic"              = confluent_kafka_topic.topic01.topic_name
+    "output.data.format"       = "JSON"
+    "quickstart"               = "ORDERS"
+    "tasks.max"                = "1"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 # Attempt to create a non-approved resource
 
 resource "confluent_invitation" "bad-invite" {
