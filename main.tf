@@ -219,10 +219,10 @@ resource "confluent_connector" "snowflake-sink" {
 
 resource "confluent_connector" "datagen-source" {
   environment {
-    id = confluent_environment.staging.id
+    id = confluent_environment.development.id
   }
   kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
+    id = confluent_kafka_cluster.dedicated.id
   }
 
   config_sensitive = {}
